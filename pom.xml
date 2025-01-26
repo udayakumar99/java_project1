@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.louder</groupId>
-  <artifactId>java-project2</artifactId>
+  <artifactId>/java-project2-1.0-SNAPSHOT</artifactId>
   <packaging>jar</packaging>
   <version>0.1</version>
-  <name>java-project2</name>
+  <name>/java-project2-1.0-SNAPSHOT</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
