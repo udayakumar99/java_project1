@@ -5,6 +5,7 @@ pipeline {
     }
     environment {
         SCANNER_HOME = tool 'mysonar'
+        IMAGE_NAME = "udayakumar99/java_project"
     }
     stages {
         stage('Clean Workspace') {
@@ -14,13 +15,13 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/udayakumar99/maven_project1.git'
+                git 'https://github.com/udayakumar99/java_project1.git'
             }
         }
         stage('Code Quality Analysis') {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=maven_project1'
+                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=java_project1'
                 }
             }
         }
@@ -33,7 +34,7 @@ pipeline {
         }
         stage('Trivy Scan (Filesystem)') {
             steps {
-                sh 'trivy fs . > trivyfs.txt'
+                sh 'trivy fs --format json -o trivyfs.json .'
             }
         }
         stage('Build with Maven') {
@@ -44,22 +45,24 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
+                    def imageTag = "${IMAGE_NAME}:${BUILD_ID}"
                     withDockerRegistry(credentialsId: '7643a792-59c0-4068-b7a0-6d91be39cc75') {
-                        sh 'docker build -t image1 .'
-                        sh 'docker tag image1 udayakumar99/maven_project:$BUILD_ID'
-                        sh 'docker push udayakumar99/maven_project:$BUILD_ID'
+                        sh "docker build -t ${imageTag} ."
+                        sh "docker push ${imageTag}"
                     }
                 }
             }
         }
         stage('Scan Docker Image') {
             steps {
-                sh 'trivy image udayakumar99/maven_project:$BUILD_ID'
+                sh "trivy image ${IMAGE_NAME}:${BUILD_ID} "
             }
         }
         stage('Run Container') {
             steps {
-                sh 'docker run -d --name cont1 -p 8080:8080 udayakumar99/maven_project:$BUILD_ID'
+                script {
+                    sh "docker run -d --name cont1 -p 8080:8080 ${IMAGE_NAME}:${BUILD_ID} "
+                }
             }
         }
     }
